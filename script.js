@@ -1,3 +1,6 @@
+import { log } from "./utils.js";
+
+
 const playerHand = [];
 const oppHand = [];
 
@@ -22,7 +25,7 @@ async function getNewDeck() {
 
 
 async function drawCard(deck_id) {
-    console.log("You are about to draw a card!");
+//    console.log("You are about to draw a card!");
     const card = await axios.get(`https://deckofcardsapi.com/api/deck/${deck_id}/draw/?count=1`)
     //console.log("Here are your card(s)", card.data)
     let currentDeck = await getDeck(deck_id);
@@ -40,11 +43,10 @@ async function startGame() {
 
     oppHand.push(await drawCard(newDeck.data.deck_id));
     oppHand.push(await drawCard(newDeck.data.deck_id));
-
 }
 (async () => {
     await startGame();
-    console.log("Hello this is your hand", playerHand);
+//    console.log("Hello this is your hand", playerHand);
     displayPlayerHand(playerHand);
     calcPlayerHandTotal(playerHand);
     calcPlayerHandTotal(oppHand);
@@ -55,12 +57,15 @@ async function startGame() {
 async function hitMe(player) {
     const hit = await drawCard(player[0].deck_id);
     player.push(hit)
+    displayCard(hit.cards[0],player.length);
 }
 
 function displayPlayerHand(player) {
-    console.log("Here is the player:, ",player);
+//    console.log("Here is the player:, ", player);
     for (let i = 0; i < player.length; i++) {
-        console.log("Here is a card", player[i].cards[0].value/*, i*/);
+  //      console.log("Here is a card", player[i].cards[0].value/*, i*/);
+        log(player[i].cards[0]);
+        displayCard(player[i].cards[0], i);
     }
 }
 
@@ -73,15 +78,15 @@ function calcPlayerHandTotal(player) {
         let currentCard = player[i].cards[0].value;
         if (currentCard === "ACE") {
             // console.log("ACE IS HERE")
-            if(sum + 11 > 21){
+            if (sum + 11 > 21) {
                 sum += 1
-            }else{
+            } else {
                 sum += 11;
             }
         } else if (currentCard === "KING" || currentCard === "QUEEN" || currentCard === "JACK") {
             // console.log("FACE CARD IS HERE")
             sum += 10;
-            if(sum > 21 && flagAce){
+            if (sum > 21 && flagAce) {
                 sum -= 10;
             }
         } else {
@@ -97,14 +102,15 @@ function calcPlayerHandTotal(player) {
 
 async function hitMeHandler() {
     await hitMe(playerHand);
-    displayPlayerHand(playerHand);
+//    displayPlayerHand(playerHand)
+    displayCard(playerHand.slice(-1).cards[0], playerHand.length-1);
     console.log("Here is the sum total of your hand", calcPlayerHandTotal(playerHand));
 }
 
 async function standHandler() {
     let playerTotal = calcPlayerHandTotal(playerHand);
     let oppTotal = calcPlayerHandTotal(oppHand);
-    console.log("Player has this hand",playerTotal);
+    console.log("Player has this hand", playerTotal);
     console.log("House has this hadn", oppHand);
     displayPlayerHand(oppHand);
 
@@ -124,7 +130,23 @@ async function standHandler() {
 hitMeBtn.addEventListener("click", hitMeHandler)
 standBtn.addEventListener("click", standHandler);
 
-function drawHand(){
-    const  template = document.querySelector(".card")
+function displayCard(card, number) {
+    console.log("Drawing now");
+    const template = document.querySelector(".card");
+    const div = document.getElementById("gameContainer");
+    const clone = template.content.cloneNode(true);
+    const imgTag = clone.childNodes[1];
+    console.log("CHECK THIS",card.image)
+    imgTag.setAttribute("src", card.image)
+    imgTag.style.position = "absolute";
+    let xpos = number * 50;
+    xpos = xpos + 100;
+    imgTag.style.left = xpos + "px";
+    imgTag.style.top = "800px";
+    imgTag.style.width = "100px";
+    log(clone);
+    div.appendChild(clone);
+
+
 }
 // drawCard(newDeck.data.deckid);
