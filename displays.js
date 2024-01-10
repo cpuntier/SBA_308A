@@ -19,9 +19,6 @@ export function displayOpponentHand(opponent){ // displays opponents hand
 
 }
 
-
-
-
 export function displayCard(card, number, player) {
     let ypos;
     let xpos;
@@ -36,8 +33,8 @@ export function displayCard(card, number, player) {
         console.log(xpos,ypos)
         number = number *-1
     }
-    console.log("Number is", number)
-    console.log("Drawing now");
+    // console.log("Number is", number)
+    // console.log("Drawing now");
 
 
     const template = document.querySelector(".card");
@@ -48,7 +45,7 @@ export function displayCard(card, number, player) {
 
     const blockTemplate = document.querySelector(".blocked");
     const blocker = blockTemplate.content.cloneNode(true);
-    console.log("HERE IS BLOCKER", blocker);
+//    console.log("HERE IS BLOCKER", blocker);
 
 
     imgTag.setAttribute("src", card.image)
@@ -56,7 +53,6 @@ export function displayCard(card, number, player) {
     xpos = xpos + (50*number);
     imgTag.style.left = xpos + "px";
     imgTag.style.top = ypos + "px";
-    console.log("Hiehgt is",ypos)
     imgTag.style.width = "7vw";
     imgTag.style.height = "10vh";
 
@@ -67,5 +63,4 @@ export function displayCard(card, number, player) {
     }
 
     div.appendChild(clone);
-
 }

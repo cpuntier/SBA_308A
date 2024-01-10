@@ -115,6 +115,13 @@ function bust(){ //what happens if bust
     const blocker = document.getElementById("blocker");
     console.log(blocker);
     blocker.remove();
+
+    const container = document.getElementById("gameContainer");
+    const template = document.getElementById("Bust");
+    const bustText = template.content.cloneNode(true);
+    console.log(bustText.childNodes);
+
+    container.appendChild(bustText);
 }
 
 async function standHandler() { //stand button handler
@@ -140,9 +147,23 @@ async function standHandler() { //stand button handler
 
     if (playerTotal > oppTotal) {
         console.log("Player Wins")
+        const container = document.getElementById("gameContainer");
+        const template = document.getElementById("winText");
+        const winText = template.content.cloneNode(true);
+        console.log(winText.childNodes);
+    
+        container.appendChild(winText);
+    
         return;
     } else {
         console.log("'House wins")
+        const container = document.getElementById("gameContainer");
+        const template = document.getElementById("loseText");
+        const loseText = template.content.cloneNode(true);
+        console.log(loseText.childNodes);
+    
+        container.appendChild(loseText);
+
         return;
     }
 }
