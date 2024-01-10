@@ -1,5 +1,5 @@
 import { drawCard, getDeck, getNewDeck } from "./requests.js";
-import { displayPlayerHand, displayCard } from "./displays.js";
+import { displayPlayerHand, displayCard, displayOpponentHand } from "./displays.js";
 import { log } from "./utils.js";
 
 // import { cheatButton } from "./cheat.js";
@@ -14,7 +14,7 @@ const cheatBtn = document.getElementById("cheatSkill");
 
 
 
-async function startGame() {
+async function startGame() {// starts game flow
     const newDeck = await getNewDeck();
 
     console.log("This is the newdeck", newDeck.data);
@@ -33,17 +33,17 @@ async function startGame() {
 (async () => {
     await startGame();
     //    console.log("Hello this is your hand", playerHand);
-    displayPlayerHand(playerHand);
-    displayOpponentHand(oppHand);
+    displayPlayerHand(playerHand); // displays player hand
+    displayOpponentHand(oppHand); // displays opponents hand
 
-    calcPlayerHandTotal(playerHand);
+    calcPlayerHandTotal(playerHand); // calculates totals of players hands
     calcPlayerHandTotal(oppHand);
 
 
 })();
 
 
-async function hitMe(player, person) {
+async function hitMe(player, person) { // allows player to draw card
     const hit = await drawCard(player[0].deck_id);
     player.push(hit)
     let returnVal = hit.cards[0]
@@ -53,16 +53,9 @@ async function hitMe(player, person) {
 }
 
 
-function displayOpponentHand(opponent){
-    for (let i = 0; i < opponent.length; i++) {
-        log(opponent[i].cards[0]);
-        displayCard(opponent[i].cards[0], i, "opponent");
-    }
-
-}
 
 
-function calcPlayerHandTotal(player) {
+function calcPlayerHandTotal(player) {//calcs hand total
     let sum = 0;
     let flagAce = 0;
     let aceLow = 0;
@@ -95,12 +88,15 @@ function calcPlayerHandTotal(player) {
                 aceLow = 1;
                 sum -=10;
             }
+    }if(currentCard ==="JOKER"){
+        sum += 100;
+        break;
     }
 }
     return sum;
 }
 
-async function hitMeHandler() {
+async function hitMeHandler() { // handler function for hitme button
     console.log("You decided to hit");
     await hitMe(playerHand, "player");
     console.log("nohey?")
@@ -113,7 +109,7 @@ async function hitMeHandler() {
     }
 }
 
-function bust(){
+function bust(){ //what happens if bust
     hitMeBtn.removeEventListener("click", hitMeHandler);
     cheatBtn.removeEventListener("click",cheatButton);
     standBtn.removeEventListener("click", standHandler);
@@ -122,7 +118,7 @@ function bust(){
     blocker.remove();
 }
 
-async function standHandler() {
+async function standHandler() { //stand button handler
     let playerTotal = calcPlayerHandTotal(playerHand);
     let oppTotal = calcPlayerHandTotal(oppHand);
     console.log("Player has this hand", playerTotal);
@@ -159,7 +155,7 @@ async function standHandler() {
 // drawCard(newDeck.data.deckid);
 
 
-async function cheatButton(){
+async function cheatButton(){ // cheat player can cheat and get a new deck with jokers in hopes opponent draws poorly.
     console.log("you are cheating");
     let cheated =  await axios.post("https://deckofcardsapi.com/api/deck/new/?jokers_enabled=true ");
     playerHand[0].deck_id = cheated.data.deck_id;

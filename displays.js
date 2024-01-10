@@ -2,7 +2,7 @@ export function displayPlayerHand(player) {
     //    console.log("Here is the player:, ", player);
     const container = document.getElementById("gameContainer");
     container.appendChild(document.createElement("p"))
-    
+
 
 
     for (let i = 0; i < player.length; i++) {
@@ -10,6 +10,15 @@ export function displayPlayerHand(player) {
         displayCard(player[i].cards[0], i, "player");
     }
 }
+
+
+export function displayOpponentHand(opponent){ // displays opponents hand
+    for (let i = 0; i < opponent.length; i++) {
+        displayCard(opponent[i].cards[0], i, "opponent");
+    }
+
+}
+
 
 
 
