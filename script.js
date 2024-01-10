@@ -153,6 +153,11 @@ async function standHandler() { //stand button handler
         console.log(winText.childNodes);
     
         container.appendChild(winText);
+
+        hitMeBtn.removeEventListener("click", hitMeHandler);
+        cheatBtn.removeEventListener("click",cheatButton);
+        standBtn.removeEventListener("click", standHandler);
+    
     
         return;
     } else {
@@ -163,6 +168,11 @@ async function standHandler() { //stand button handler
         console.log(loseText.childNodes);
     
         container.appendChild(loseText);
+
+        hitMeBtn.removeEventListener("click", hitMeHandler);
+        cheatBtn.removeEventListener("click",cheatButton);
+        standBtn.removeEventListener("click", standHandler);
+    
 
         return;
     }
