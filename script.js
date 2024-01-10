@@ -1,6 +1,5 @@
 import { drawCard, getDeck, getNewDeck } from "./requests.js";
 import { displayPlayerHand, displayCard, displayOpponentHand } from "./displays.js";
-import { log } from "./utils.js";
 
 // import { cheatButton } from "./cheat.js";
 
