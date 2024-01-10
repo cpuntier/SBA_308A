@@ -1,4 +1,8 @@
+import { drawCard, getDeck, getNewDeck } from "./requests.js";
+import { displayPlayerHand, displayCard } from "./displays.js";
 import { log } from "./utils.js";
+
+// import { cheatButton } from "./cheat.js";
 
 
 const playerHand = [];
@@ -6,32 +10,9 @@ const oppHand = [];
 
 const hitMeBtn = document.getElementById("hitMe");
 const standBtn = document.getElementById("stand");
+const cheatBtn = document.getElementById("cheatSkill");
 
 
-
-
-
-async function getDeck(deck_id) {
-    const response = await axios.get(`https://deckofcardsapi.com/api/deck/${deck_id}/`);
-    // console.log("This is the deck", response.data)
-    return response;
-}
-
-
-async function getNewDeck() {
-    const response = await axios.get('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1')
-    return response;
-}
-
-
-async function drawCard(deck_id) {
-//    console.log("You are about to draw a card!");
-    const card = await axios.get(`https://deckofcardsapi.com/api/deck/${deck_id}/draw/?count=1`)
-    //console.log("Here are your card(s)", card.data)
-    let currentDeck = await getDeck(deck_id);
-    // console.log("here is the current deck", currentDeck);
-    return card.data;
-}
 
 async function startGame() {
     const newDeck = await getNewDeck();
@@ -43,110 +24,144 @@ async function startGame() {
 
     oppHand.push(await drawCard(newDeck.data.deck_id));
     oppHand.push(await drawCard(newDeck.data.deck_id));
+    hitMeBtn.addEventListener("click", hitMeHandler)
+    standBtn.addEventListener("click", standHandler);
+    cheatBtn.addEventListener("click", cheatButton);
 }
+
+
 (async () => {
     await startGame();
-//    console.log("Hello this is your hand", playerHand);
+    //    console.log("Hello this is your hand", playerHand);
     displayPlayerHand(playerHand);
+    displayOpponentHand(oppHand);
+
     calcPlayerHandTotal(playerHand);
     calcPlayerHandTotal(oppHand);
 
 
 })();
 
-async function hitMe(player) {
+
+async function hitMe(player, person) {
     const hit = await drawCard(player[0].deck_id);
     player.push(hit)
-    displayCard(hit.cards[0],player.length);
+    let returnVal = hit.cards[0]
+    displayCard(returnVal, player.length - 1,person);
+    const deck = await getDeck(player[0].deck_id);
+    console.log("This is the deck",deck);
 }
 
-function displayPlayerHand(player) {
-//    console.log("Here is the player:, ", player);
-    for (let i = 0; i < player.length; i++) {
-  //      console.log("Here is a card", player[i].cards[0].value/*, i*/);
-        log(player[i].cards[0]);
-        displayCard(player[i].cards[0], i);
+
+function displayOpponentHand(opponent){
+    for (let i = 0; i < opponent.length; i++) {
+        log(opponent[i].cards[0]);
+        displayCard(opponent[i].cards[0], i, "opponent");
     }
+
 }
 
 
 function calcPlayerHandTotal(player) {
     let sum = 0;
     let flagAce = 0;
+    let aceLow = 0;
     for (let i = 0; i < player.length; i++) {
         // console.log(typeof player[i].cards[0].value);
+
         let currentCard = player[i].cards[0].value;
         if (currentCard === "ACE") {
-            // console.log("ACE IS HERE")
-            if (sum + 11 > 21) {
-                sum += 1
-            } else {
-                sum += 11;
-            }
-        } else if (currentCard === "KING" || currentCard === "QUEEN" || currentCard === "JACK") {
-            // console.log("FACE CARD IS HERE")
-            sum += 10;
-            if (sum > 21 && flagAce) {
+            flagAce = 1;
+            console.log("ACE!!!")
+            sum += 11;
+            if( sum > 21){
+                aceLow = 1;
                 sum -= 10;
+            }else if(aceLow){
+                sum += 1;
+            }
+
+        }
+        else if (currentCard === "KING" || currentCard === "QUEEN" || currentCard === "JACK") {
+            console.log("Face card here")
+            sum += 10;
+            if(flagAce && !aceLow && sum > 21){
+                aceLow = 1;
+                sum -= 1;
             }
         } else {
             sum += parseInt(currentCard);
-        }
-        if (sum > 21 && flagAce === 1) {
-            sum -= 10;
-            flagAce = 0;
-        }
+            if(sum > 21 && !aceLow && flagAce){
+                aceLow = 1;
+                sum -=10;
+            }
     }
+}
     return sum;
 }
 
 async function hitMeHandler() {
-    await hitMe(playerHand);
-//    displayPlayerHand(playerHand)
-    displayCard(playerHand.slice(-1).cards[0], playerHand.length-1);
-    console.log("Here is the sum total of your hand", calcPlayerHandTotal(playerHand));
+    console.log("You decided to hit");
+    await hitMe(playerHand, "player");
+    console.log("nohey?")
+    console.log("hey");
+    let sum = calcPlayerHandTotal(playerHand);
+    console.log("Here is the sum total of your hand", sum);
+    if(sum > 21){
+        console.log("BUST");
+        bust();
+    }
+}
+
+function bust(){
+    hitMeBtn.removeEventListener("click", hitMeHandler);
+    cheatBtn.removeEventListener("click",cheatButton);
+    standBtn.removeEventListener("click", standHandler);
+    const blocker = document.getElementById("blocker");
+    console.log(blocker);
+    blocker.remove();
 }
 
 async function standHandler() {
     let playerTotal = calcPlayerHandTotal(playerHand);
     let oppTotal = calcPlayerHandTotal(oppHand);
     console.log("Player has this hand", playerTotal);
-    console.log("House has this hadn", oppHand);
-    displayPlayerHand(oppHand);
+    console.log("House has this hand", oppHand);
+    // displayOpponentHand(oppHand);
+    const blocker = document.getElementById("blocker");
+    blocker.remove();
 
     while (oppTotal < 17) {
 
-        await hitMe(oppHand);
-        displayPlayerHand(oppHand);
+        await hitMe(oppHand, "opponent");
+//displayOpponentHand(oppHand);
         oppTotal = calcPlayerHandTotal(oppHand);
         console.log(oppTotal);
     }
+    if(oppTotal > 21){
+        console.log("Player Wins")
+        return;
+    }
+
     if (playerTotal > oppTotal) {
         console.log("Player Wins")
+        return;
     } else {
         console.log("'House wins")
+        return;
     }
 }
-hitMeBtn.addEventListener("click", hitMeHandler)
-standBtn.addEventListener("click", standHandler);
-
-function displayCard(card, number) {
-    console.log("Drawing now");
-    const template = document.querySelector(".card");
-    const div = document.getElementById("gameContainer");
-    const clone = template.content.cloneNode(true);
-    const imgTag = clone.childNodes[1];
-    console.log("CHECK THIS",card.image)
-    imgTag.setAttribute("src", card.image)
-    imgTag.style.position = "absolute";
-    let xpos = number * 50;
-    xpos = xpos + 100;
-    imgTag.style.left = xpos + "px";
-    imgTag.style.top = "800px";
-    imgTag.style.width = "100px";
-    log(clone);
-    div.appendChild(clone);
 
 
-}
+
+
+
 // drawCard(newDeck.data.deckid);
+
+
+async function cheatButton(){
+    console.log("you are cheating");
+    let cheated =  await axios.post("https://deckofcardsapi.com/api/deck/new/?jokers_enabled=true ");
+    playerHand[0].deck_id = cheated.data.deck_id;
+    console.log(playerHand[0]);
+}

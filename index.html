@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SBA BlackJack Project`</title>
+    <!-- <link rel="stylesheet" href="./style.css"> -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script defer type = "module" src="script.js"></script>
 
@@ -12,16 +13,40 @@
 
 <body>
     <div id="gameContainer">
-        <h1>BLACK JACK SBA</h1>
+        <h1>BLACK JACK</h1>
         <button id="hitMe">Hit Me</button>
         <button id="stand">Stand</button>
+        <button id ="cheatSkill">Cheat!</button>
+
     </div>
+
 </body>
 
 
 
 <!-- Card Template -->
 <template class = "card">
-    <img src="" alt="">This is me!</img>
+    <img src=""></img>
 </template>
 </html>
+
+<!-- Blocked template -->
+<template class = "blocked">
+    <div>
+    <div id = "blocker" style = "background-color: gray; position:absolute; width: 7vw; height:10vh; top:100px; left:500px; z-index: 1;"></div>
+    </div>
+</template>
+
+<!-- Text Template -->
+<template class = "text">
+    <div>
+        <p>Total = </p>
+    </div>
+</template>
+
+<!-- Busted -->
+<template class = "Bust">
+    <div>
+        <p>BUST</p>
+    </div>
+</template>
